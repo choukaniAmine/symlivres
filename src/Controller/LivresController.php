@@ -17,15 +17,17 @@ class LivresController extends AbstractController
     {
         //  $rep = $doctrine->getRepository(Livres::class);
         $livres = $rep->findAll();
-
-        dd($livres);
+        return $this->render('livres/affiche.html.twig', [
+            'livres' => $livres
+        ]);
     }
 
     #[Route('/admin/livres/find/{id}', name: 'app_livres_find')]
     public function chercher(Livres $livre): Response
     {
-
-        dd($livre);
+        return $this->render('livres/afficheimage.html.twig', [
+            'livre' => $livre
+        ]);
     }
 
     #[Route('/admin/livres/add', name: 'app_livres_add')]
@@ -42,7 +44,7 @@ class LivresController extends AbstractController
         $em = $doctrine->getManager();
         $em->persist($livre);
         $em->flush();
-        dd($livre);
+        return $this->redirectToRoute('app_livres_findall');
     }
 
     #[Route('/admin/livres/update/{id}', name: 'app_livres_update')]
@@ -51,7 +53,8 @@ class LivresController extends AbstractController
         $livre->setPrix(250);
         $em = $doctrine->getManager();
         $em->flush();
-        dd($livre);
+        //dd($livre);
+        return $this->redirectToRoute('app_livres_findall');
     }
 
     #[Route('/admin/livres/delete/{id}', name: 'app_livres_delete')]
@@ -61,6 +64,7 @@ class LivresController extends AbstractController
         $em = $doctrine->getManager();
         $em->remove($livre);
         $em->flush();
-        dd($livre);
+        // dd($livre);
+        return $this->redirectToRoute('app_livres_findall');
     }
 }
