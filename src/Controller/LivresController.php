@@ -2,23 +2,30 @@
 
 namespace App\Controller;
 
+use DateTime;
 use App\Entity\Livres;
 use App\Repository\LivresRepository;
-use DateTime;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class LivresController extends AbstractController
 {
     #[Route('/admin/livres', name: 'app_livres_findall')]
-    public function index(LivresRepository $rep): Response
+    public function index(LivresRepository $rep, PaginatorInterface $paginator, Request $request): Response
     {
         //  $rep = $doctrine->getRepository(Livres::class);
         $livres = $rep->findAll();
+        $pagination = $paginator->paginate(
+            $livres, /* query NOT result */
+            $request->query->getInt('page', 1), /*page number*/
+            5 /*limit per page*/
+        );
         return $this->render('livres/affiche.html.twig', [
-            'livres' => $livres
+            'livres' => $pagination
         ]);
     }
 
