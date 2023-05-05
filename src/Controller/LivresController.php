@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use DateTime;
 use App\Entity\Livres;
+use App\Form\LivresType;
 use App\Repository\LivresRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Knp\Component\Pager\PaginatorInterface;
@@ -38,20 +39,22 @@ class LivresController extends AbstractController
     }
 
     #[Route('/admin/livres/add', name: 'app_livres_add')]
-    public function add(ManagerRegistry $doctrine): Response
+    public function add(ManagerRegistry $doctrine, Request $request): Response
     {
-        $date = new DateTime('2022-01-01');
+
         $livre = new Livres();
-        $livre->setLibelle("reseau")
-            ->setImage("https://via.placeholder.com/300")
-            ->setPrix(150)
-            ->setEditeur("DUNOO")
-            ->setResume("resume de reseau ................")
-            ->setDateEdition($date);
-        $em = $doctrine->getManager();
-        $em->persist($livre);
-        $em->flush();
-        return $this->redirectToRoute('app_livres_findall');
+        $form = $this->createForm(LivresType::class, $livre);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $livre = $form->getData();
+            $em = $doctrine->getManager();
+            $em->persist($livre);
+            $em->flush();
+            return new Response('livre ajoute avec succees');
+        }
+        return $this->render('livres/add.html.twig', [
+            'f' => $form
+        ]);
     }
 
     #[Route('/admin/livres/update/{id}', name: 'app_livres_update')]
